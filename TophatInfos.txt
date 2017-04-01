@@ -1,0 +1,48 @@
+# Index the uniORFs.fasta file for reference usage in Tophat:
+# Please note that it is highly recommended that a FASTA file with the sequence(s) the genome being indexed be present in the same directory with the Bowtie index files and having the name <genome_index_base>.fa. If not present, TopHat will automatically rebuild this FASTA file from the Bowtie index files.
+bowtie2-build -f uniORFs.fasta	uniORFs
+
+# Run tophat 
+tophat --read-realign-edit-dist 1000 --mate-inner-dist 49 --mate-std-dev 10 -a 8 -m 0 -i 70 -I 5000 -p 2 --max-multihits 10 --library-type fr-unstranded --min-segment-intron 20 --max-segment-intron 5000 --min-coverage-intron 20 --max-coverage-intron 5000 --b2-sensitive uniORFs Galaxy89….fq Galaxy90….fq
+
+
+#-N/--read-mismatches 2				Final read alignments having more than these many mismatches are discarded. The default is 2.
+#--read-gap-length 2					Final read alignments having more than these many total length of gaps are discarded. The default is 2.
+#--read-edit-dist 2					Final read alignments having more than these many edit distance are discarded. The default is 2.
+--read-realign-edit-dist 1000		Some of the reads spanning multiple exons may be mapped incorrectly as a contiguous alignment to the genome even though the correct alignment should be a spliced one - this can happen in the presence of processed pseudogenes that are rarely (if at all) transcribed or expressed. This option can direct TopHat to re-align reads for which the edit distance of an alignment obtained in a previous mapping step is above or equal to this option value. If you set this option to 0, TopHat will map every read in all the mapping steps (transcriptome if you provided gene annotations, genome, and finally splice variants detected by TopHat), reporting the best possible alignment found in any of these mapping steps. This may greatly increase the mapping accuracy at the expense of an increase in running time. The default value for this option is set such that TopHat will not try to realign reads already mapped in earlier steps.
+#-o/--output-dir 					Sets the name of the directory in which TopHat will write all of its output. The default is "./tophat_out".
+-r/--mate-inner-dist 49				This is the expected (mean) inner distance between mate pairs. For, example, for paired end runs with fragments selected at 300bp, where each end is 50bp, you should set -r to be 200. The default is 50bp.
+--mate-std-dev 10					The standard deviation for the distribution on inner distances between mate pairs. The default is 20bp.
+-a/--min-anchor-length 8			The "anchor length". TopHat will report junctions spanned by reads with at least this many bases on each side of the junction. Note that individual spliced alignments may span a junction with fewer than this many bases on one side. However, every junction involved in spliced alignments is supported by at least one read with this many bases on each side.	This must be at least 3 and the default is 8.
+-m/--splice-mismatches 0			The maximum number of mismatches that may appear in the "anchor" region of a spliced alignment. The default is 0.
+-i/--min-intron-length 70			The minimum intron length. TopHat will ignore donor/acceptor pairs closer than this many bases apart. The default is 70.
+-I/--max-intron-length 5000			The maximum intron length. When searching for junctions ab initio, TopHat will ignore donor/acceptor pairs farther than this many bases apart, except when such a pair is supported by a split segment alignment of a long read. The default is 500000.
+#--max-insertion-length 3			The maximum insertion length. The default is 3.
+#--max-deletion-length 3				The maximum deletion length. The default is 3.
+
+#Common usage: tophat --color --quals [other options]* <colorspace_index_base> <reads1_1[,...,readsN_1]> [reads1_2,...readsN_2] <quals1_1[,...,qualsN_1]> [quals1_2,...qualsN_2]
+-p/--num-threads 2					Use this many threads to align reads. The default is 1.
+-g/--max-multihits 10				Instructs TopHat to allow up to this many alignments to the reference for a given read, and choose the alignments based on their alignment scores if there are more than this number. The default is 20 for read mapping. Unless you use --report-secondary-alignments, TopHat will report the alignments with the best alignment score. If there are more alignments with the same score than this number, TopHat will randomly report only this many alignments. In case of using --report-secondary-alignments, TopHat will try to report alignments up to this option value, and TopHat may randomly output some of the alignments with the same score to meet this number.
+--library-type fr-unstranded		The default is unstranded (fr-unstranded). If either fr-firststrand or fr-secondstrand is specified, every read alignment will have an XS attribute tag as explained below. Consider supplying library type options below to select the correct RNA-seq protocol.
+
+#--segment-mismatches 2				Read segments are mapped independently, allowing up to this many mismatches in each segment alignment. The default is 2.
+#--segment-length 25					Each read is cut up into segments, each at least this long. These segments are mapped independently. The default is 25.
+--min-segment-intron 20				The minimum intron length that may be found during split-segment search. The default is 50.
+--max-segment-intron 5000			The maximum intron length that may be found during split-segment search. The default is 500000.
+--min-coverage-intron 20			The minimum intron length that may be found during coverage search. The default is 50.
+--max-coverage-intron 5000			The maximum intron length that may be found during coverage search. The default is 20000.
+#-R/--resume <string>				In case a TopHat run was terminated prematurely (process failure due to external factors, e.g. running out of memory because of other processes running on the same machine, or the disk getting full), users can attempt to resume the interrupted TopHat run by just providing this option with the output directory for that run. TopHat sets several checkpoints after every lengthy operations in the pipeline and when this option is provided, it will attempt to resume the pipeline from the last successful checkpoint. This special usage of TopHat only requires this option, e.g. the command line could simply be:
+#Note that none of the original options used for the original TopHat run should be provided, TopHat will find all the original options (and the checkpoint info) in the logs/run.log file found in the specified directory.
+#Bowtie 2 specific options:
+#Bowtie 2 provides many options so that users can have more flexibility as to how reads are mapped. TopHat 2 allows users to pass many of these options to Bowtie 2 by preceding the Bowtie 2 option name with the --b2- prefix.  Please refer to the Bowtie2 website for detailed information.
+#Preset options in --end-to-end mode  (local alignment is not used in TopHat2):
+#Tophat 2 option:
+#Corresponding Bowtie 2 option:
+--b2-sensitive
+
+
+#--no-novel-juncs	Only look for reads across junctions indicated in the supplied GFF or junctions file. (ignored without -G/-j)
+#-G/--GTF <GTF/GFF3 file>	
+#Supply TopHat with a set of gene model annotations and/or known transcripts, as a GTF 2.2 or GFF3 formatted file. If this option is provided, TopHat will first extract the transcript sequences and use Bowtie to align reads to this virtual transcriptome first. Only the reads that do not fully map to the transcriptome will then be mapped on the genome. The reads that did map on the transcriptome will be converted to genomic mappings (spliced as needed) and merged with the novel mappings and junctions in the final tophat output.
+#Please note that the values in the first column of the provided GTF/GFF file (column which indicates the chromosome or contig on which the feature is located), must match the name of the reference sequence in the Bowtie index you are using with TopHat. You can get a list of the sequence names in a Bowtie index by typing:
+#bowtie-inspect --names your_index
