@@ -1,0 +1,7 @@
+fastqc
+
+java -jar /home/student1/programs/Trimmomatic-0.36/trimmomatic-0.36.jar PE -phred33 demo_reads_LIB1_1.fastq demo_reads_LIB1_2.fastq demo_reads_LIB1_1_paired.fastq demo_reads_LIB1_1_unpaired.fastq demo_reads_LIB1_2_paired.fastq demo_reads_LIB1_2_unpaired.fastq ILLUMINACLIP:TruSeq3-SE:2:30:10 SLIDINGWINDOW:5:20 HEADCROP:17 MINLEN:50
+
+Trinity --seqType fq --max_memory 2G --left demo_reads_LIB1_1_paired.fastq --right demo_reads_LIB1_2_paired.fastq --CPU 2
+
+
