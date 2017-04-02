@@ -1,0 +1,14 @@
+TrimmomaticPE: Started with arguments:
+ -phred33 demo_reads_LIB1_1.fastq demo_reads_LIB1_2.fastq demo_reads_LIB1_1_paired.fastq demo_reads_LIB1_1_unpaired.fastq demo_reads_LIB1_2_paired.fastq demo_reads_LIB1_2_unpaired.fastq ILLUMINACLIP:TruSeq3-SE:2:30:10 SLIDINGWINDOW:5:20 HEADCROP:17 MINLEN:50
+java.io.FileNotFoundException: /usr/users/sl/winj/data/Ronny_Hpc/demo_trinity/TruSeq3-SE (No such file or directory)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at org.usadellab.trimmomatic.fasta.FastaParser.parse(FastaParser.java:54)
+	at org.usadellab.trimmomatic.trim.IlluminaClippingTrimmer.loadSequences(IlluminaClippingTrimmer.java:110)
+	at org.usadellab.trimmomatic.trim.IlluminaClippingTrimmer.makeIlluminaClippingTrimmer(IlluminaClippingTrimmer.java:71)
+	at org.usadellab.trimmomatic.trim.TrimmerFactory.makeTrimmer(TrimmerFactory.java:32)
+	at org.usadellab.trimmomatic.Trimmomatic.createTrimmers(Trimmomatic.java:59)
+	at org.usadellab.trimmomatic.TrimmomaticPE.run(TrimmomaticPE.java:536)
+	at org.usadellab.trimmomatic.Trimmomatic.main(Trimmomatic.java:80)
+Input Read Pairs: 75478 Both Surviving: 67417 (89.32%) Forward Only Surviving: 4651 (6.16%) Reverse Only Surviving: 1322 (1.75%) Dropped: 2088 (2.77%)
+TrimmomaticPE: Completed successfully
