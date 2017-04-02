@@ -1,0 +1,35 @@
+fastqc
+
+java -jar /home/student1/programs/Trimmomatic-0.36/trimmomatic-0.36.jar PE -phred33 demo_reads_LIB1_1.fastq demo_reads_LIB1_2.fastq demo_reads_LIB1_1_paired.fastq demo_reads_LIB1_1_unpaired.fastq demo_reads_LIB1_2_paired.fastq demo_reads_LIB1_2_unpaired.fastq ILLUMINACLIP:TruSeq3-SE:2:30:10 SLIDINGWINDOW:5:20 HEADCROP:17 MINLEN:50
+
+Trinity --seqType fq --max_memory 2G --left demo_reads_LIB1_1_paired.fastq --right demo_reads_LIB1_2_paired.fastq --CPU 2
+
+
+
+makeblastdb -in Trinity.fasta -dbtype nucl
+
+tblastn -db Trinity.fasta -query arabidopsis_TAIR10.faa  -out arabidopsis_tbn_Trinity_fasta_out.txt -evalue 1e-3
+
+
+
+tblastn -db Trinity.fasta -query Hyaloperonospora_arabidopsidis_v8.3_14910.faa  -out hpa_tbn_Trinity_fasta_out.txt -evalue 1e-3
+
+
+
+perl find_all_full-length_hits.pl arabidopsis_tbn_Trinity_fasta_out.txt > arabidosis_fl_hits.txt
+
+
+bowtie2-build -f uniORFs_10.fa uniORFs_10
+
+
+tophat --read-realign-edit-dist 1000 --mate-inner-dist 49 --mate-std-dev 10 -a 8 -m 0 -i 70 -I 5000 --max-multihits 10 --library-type fr-unstranded --min-segment-intron 20 --max-segment-intron 5000 --min-coverage-intron 20 --max-coverage-intron 5000 --b2-sensitive uniORFs_10 demo_reads_LIB1_1.fastq demo_reads_LIB1_2.fastq
+
+
+
+
+samtools sort -o accepted_hits_sorted.bam accepted_hits.bam
+samtools index accepted_hits_sorted.bam
+samtools idxstats accepted_hits_sorted.bam > accepted_hits_sorted.bam.idxstats
+
+samtools mpileup -A -E -uf uniORFs_10.fa accepted_hits_sorted.bam | bcftools call -c | vcfutils.pl vcf2fq > cns_uniORFs_10_cns.fastq
+
